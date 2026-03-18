@@ -1,0 +1,8 @@
+spacy>=3.5.0
+en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.5.0/en_core_web_lg-3.5.0-py3-none-any.whl
+py2neo>=2021.2.3
+neo4j>=5.0.0
+numpy>=1.23.0
+tqdm>=4.64.0
+requests>=2.28.0
+python-dotenv>=1.0.0
