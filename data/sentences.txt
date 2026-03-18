@@ -1,49 +1,19 @@
-# Cryptocurrency Knowledge Graph — Input Corpus
-# 45 sentences covering key entities and relationships in the crypto/fintech domain.
-# Sentence types: active voice, passive voice, compound subjects, embedded clauses.
+# Cryptocurrency / Fintech domain sentences for IE pipeline
+# One sentence per line. Lines starting with '#' are comments.
+# Replace / extend these with your actual corpus.
 
-Ethereum was developed by Vitalik Buterin in 2014
-Santander Bank is exploring the possibility of investing in Polygon to expand its payment system capabilities.
-Polygon formed a strategic partnership with Santander Bank to create an innovative cross-border payment platform.
-Ethereum Classic was developed by Charlie Shrem in his garage
-Polygon is hiring VC analyst
-Ethereum Classic is hiring Software analyst
-Charlie Shrem discovered Ethereum Classic
-Etherium is based on BTC for some of its components was the statement made by its founder in 2022
-Ripple partnered with Visa to improve their payment system.
-Ripple partners with banks to improve cross-border payments
-Visa partners with several cryptocurrency platforms to enable the use of cryptocurrencies for everyday purchases
-Blockchain and BTC is based on cryptocurrency.
-Ripple partnered with Santander Bank to create a cross-border payments platform.
-Ripple was partnered with Polygon to improve their payment system.
-Charlie Shrem is seeking software analysts for Ethereum Classic development.
-Etherium has a vacancy for a VC analyst position.
-Visa collaborates with cryptocurrency platforms to facilitate the everyday use of digital currencies.
-The founder of Ethereum stated in 2023 that some of its components would be based on Ripple.
-IBM invested in Stellar and caused a surge in interest and investment in the cryptocurrency market.
-Santander Bank joined forces with Visa to develop a cross-border payments platform.
-Tesla invests $1.5 billion in Bitcoin.
-Visa is considering investing in Ripple to further enhance their cross-border payment system.
-Several cryptocurrency platforms are considering investing in Polygon to expand their payment system capabilities.
-The founder of Ripple revealed that the company has invested in several cryptocurrency platforms to facilitate the everyday use of digital currencies.
-Ripple joined forces with Visa to enhance and upgrade its payment system.
-Cardano and Ethereum partnered to develop a blockchain-based platform for the gaming industry.
-Stellar and IBM partnered to develop a blockchain-based supply chain management platform.
-Ripple partnered Stellar to enable users to send money internationally.
-Ripple is exploring investment in Polygon to create a more integrated payment ecosystem.
-Visa partners with Cardano to enable customers to use digital currencies for everyday purchases.
-Ripple has forged partnership with banks, including Banco Santander, Bank of America, and Standard Chartered, to facilitate cross-border payments using its blockchain technology.
-Banks are investing in Cardano's technology to improve their payment system capabilities.
-IBM invested in Cardano and caused a surge in interest and investment in the cryptocurrency market.
-Tesla invested in Etherium and announced plans to accept it as a form of payment for their electric vehicles.
-Visa invested in Polygon and is exploring ways to incorporate its technology into their payment system.
-Ethereum Classic was discovered by Charlie Shrem.
-Ripple in partnership with Polygon to improve their payment system is another exciting development in the rapidly evolving cryptocurrency market.
-Vitalik Buterin is the inventor of Ethereum.
-IBM partnered with Stellar to provide financial services using blockchain technology.
-Bitcoin was invented by Satoshi Nakamoto.
-Cardano is based on Ethereum in terms of its smart contract functionality.
-Ripple partnered with Santander Bank for international payments.
-Tesla investing in Bitcoin signaled mainstream adoption of cryptocurrency.
-IBM invested in Blockchain technology to improve supply chain management.
-Ethereum Classic is a derivative of Ethereum following the 2016 DAO hack.
+Ripple partnered with Visa to improve their cross-border payment system.
+Ethereum was developed by Vitalik Buterin.
+IBM invested in Stellar to advance enterprise blockchain solutions.
+Tesla invests in Bitcoin as part of its treasury strategy.
+Cardano partnered with Ethereum to develop interoperability protocols.
+Santander Bank joined forces with Visa to digitise international transfers.
+Visa collaborates with several cryptocurrency platforms to enable card payments.
+Polygon is hiring a VC analyst to expand its ecosystem fund.
+Ripple has developed a payment protocol based on blockchain technology.
+Bitcoin was created by Satoshi Nakamoto in 2008.
+Coinbase acquired Bison Trails to strengthen its node infrastructure.
+Andreessen Horowitz invested in Coinbase during its early funding rounds.
+JPMorgan Chase launched its own digital currency called JPM Coin.
+Binance partnered with Mastercard to issue crypto debit cards.
+Ethereum Foundation supports the development of layer-2 scaling solutions.
