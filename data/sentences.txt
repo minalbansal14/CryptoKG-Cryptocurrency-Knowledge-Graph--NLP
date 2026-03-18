@@ -1,0 +1,19 @@
+# Cryptocurrency / Fintech domain sentences for IE pipeline
+# One sentence per line. Lines starting with '#' are comments.
+# Replace / extend these with your actual corpus.
+
+Ripple partnered with Visa to improve their cross-border payment system.
+Ethereum was developed by Vitalik Buterin.
+IBM invested in Stellar to advance enterprise blockchain solutions.
+Tesla invests in Bitcoin as part of its treasury strategy.
+Cardano partnered with Ethereum to develop interoperability protocols.
+Santander Bank joined forces with Visa to digitise international transfers.
+Visa collaborates with several cryptocurrency platforms to enable card payments.
+Polygon is hiring a VC analyst to expand its ecosystem fund.
+Ripple has developed a payment protocol based on blockchain technology.
+Bitcoin was created by Satoshi Nakamoto in 2008.
+Coinbase acquired Bison Trails to strengthen its node infrastructure.
+Andreessen Horowitz invested in Coinbase during its early funding rounds.
+JPMorgan Chase launched its own digital currency called JPM Coin.
+Binance partnered with Mastercard to issue crypto debit cards.
+Ethereum Foundation supports the development of layer-2 scaling solutions.
