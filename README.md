@@ -162,31 +162,32 @@ Connected all extracted triples to Neo4j:
 ## 📂 Repository Structure
 
 ```
-knowledge-graph-nlp/
+CryptoKG-Cryptocurrency-Knowledge-Graph--NLP/
 │
 ├── README.md
-│
-├── notebooks/
-│   ├── 01_data_collection.ipynb          # Corpus and sentence curation
-│   ├── 02_triple_extraction.ipynb         # Core SPO extraction algorithm
-│   ├── 03_custom_ner_training.ipynb       # NER model training
-│   ├── 04_extended_extraction.ipynb       # Expanded sentence set
-│   ├── 05_pipeline_refinement.ipynb       # Improved dependency patterns
-│   └── 06_knowledge_graph_construction.ipynb  # Neo4j graph building
-│
-├── src/
-│   ├── triple_extractor.py                # Extraction logic (portable)
-│   ├── ner_pipeline.py                    # NER model loader
-│   └── graph_builder.py                   # Neo4j node/edge loading
-│
-├── data/
-│   ├── sentences.txt                      # Input corpus
-│   ├── entities_dict.json                 # Entity gazetteer + Wikidata IDs
-│   └── relations_dict.json                # Relation gazetteer + Wikidata IDs
-│
 ├── requirements.txt
-└── .gitignore
+├── .gitignore
+│
+├── notebooks/                             # Progressive pipeline notebooks
+│   ├── 02_triple_extraction.ipynb         # Core SPO extraction algorithm
+│   ├── 03_custom_ner_training.ipynb       # NER model training (spaCy)
+│   ├── 04_entity_linking.ipynb            # Entity disambiguation (Knowledge Base)
+│   ├── 05_pipeline_refinement.ipynb       # Coreference + pipeline refinement
+│   └── 06_knowledge_graph_construction.ipynb  # Neo4j graph building + enrichment
+│
+├── src/                                   # Reusable Python modules
+│   ├── __init__.py
+│   ├── gazetteers.py                      # Loads entity/relation gazetteers + Wikidata maps
+│   ├── triple_extractor.py                # Full SPO extraction pipeline class
+│   └── graph_builder.py                   # Neo4j node/edge loading utilities
+│
+└── data/                                  # Static assets
+    ├── sentences.txt                      # Input corpus (45 domain sentences)
+    ├── entities.json                      # Entity gazetteer with Wikidata Q-IDs
+    └── relations.json                     # Relation gazetteer with Wikidata P-IDs
 ```
+
+> **Note:** Activity 1 (data collection — web scraping CoinMarketCap and Twitter API) is described in the Activities section below. The corresponding Colab notebook (`activity2_team08.ipynb`) handled both data collection and early extraction prototyping; the cleaned version is `notebooks/02_triple_extraction.ipynb`.
 
 ---
 
@@ -195,24 +196,42 @@ knowledge-graph-nlp/
 ### Prerequisites
 
 ```bash
-pip install spacy py2neo neo4j requests numpy tqdm
+pip install -r requirements.txt
 python -m spacy download en_core_web_lg
 ```
 
 ### Running the Extraction
 
 ```python
-from src.triple_extractor import extract_triples_from_sentence
+from src.triple_extractor import TripleExtractor
+
+extractor = TripleExtractor()
 
 sentence = "Ripple partnered with Visa to improve their payment system."
-triples = extract_triples_from_sentence(sentence)
+triples = extractor.extract(sentence)
 
-# Output: [('Q1307473', 'Ripple'), ('P1327', 'partnered with'), ('Q328840', 'Visa')]
+# Output: [('Q1307473', 'Ripple', 'P1327', 'partnered with', 'Q328840', 'Visa')]
+```
+
+With a custom NER model (trained in `notebooks/03_custom_ner_training.ipynb`):
+
+```python
+extractor = TripleExtractor(custom_ner_path="path/to/model-best")
+```
+
+### Loading the Gazetteers
+
+```python
+from src.gazetteers import load_entities, load_relations, load_entity_wikidata_map
+
+entities = load_entities()          # list of entity surface forms
+relations = load_relations()        # list of relation surface forms
+wikidata_map = load_entity_wikidata_map()  # {"Visa": "Q328840", ...}
 ```
 
 ### Neo4j Connection
 
-Create a `.env` file or credentials JSON (not committed to git):
+Create a `neo4j_credentials.json` file (not committed to git):
 
 ```json
 {
@@ -222,7 +241,15 @@ Create a `.env` file or credentials JSON (not committed to git):
 }
 ```
 
-Then run `notebooks/06_knowledge_graph_construction.ipynb` end to end.
+```python
+from src.graph_builder import GraphBuilder
+
+builder = GraphBuilder(uri="bolt://localhost:7687", user="neo4j", password="secret")
+builder.add_nodes(node_tuples)
+builder.add_edges(edge_tuples)
+```
+
+Or follow `notebooks/06_knowledge_graph_construction.ipynb` end to end for the full pipeline.
 
 ---
 

@@ -1,1 +1,1 @@
-# CryptoKG — NLP Information Extraction Pipeline
+# CryptoKG — source package

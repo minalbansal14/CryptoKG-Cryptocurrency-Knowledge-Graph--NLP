@@ -1,0 +1,128 @@
+[
+  {
+    "qid": "Q328840",
+    "label": "Visa",
+    "description": "American multinational financial services corporation",
+    "aliases": [],
+    "ner_label": "COMPANY"
+  },
+  {
+    "qid": "Q16197959",
+    "label": "Vitalik Buterin",
+    "description": "Russian-Canadian computer scientist and co-founder of Ethereum",
+    "aliases": [],
+    "ner_label": "PERSON"
+  },
+  {
+    "qid": "Q47273538",
+    "label": "Cardano",
+    "description": "Decentralized, open-source blockchain network for peer-to-peer transactions and smart contracts",
+    "aliases": [],
+    "ner_label": "CRYPTOCURRENCY"
+  },
+  {
+    "qid": "Q478214",
+    "label": "Tesla",
+    "description": "American automotive, energy storage and solar power company",
+    "aliases": [],
+    "ner_label": "COMPANY"
+  },
+  {
+    "qid": "Q5835668",
+    "label": "Santander Bank",
+    "description": "Wholly owned subsidiary of Spanish Santander Group",
+    "aliases": [],
+    "ner_label": "COMPANY"
+  },
+  {
+    "qid": "Q22687",
+    "label": "bank",
+    "description": "Financial institution that accepts deposits and channels them into lending activities",
+    "aliases": ["banks"],
+    "ner_label": "ORG"
+  },
+  {
+    "qid": "Q1307473",
+    "label": "Ripple",
+    "description": "Real-time gross settlement system and currency exchange network",
+    "aliases": [],
+    "ner_label": "CRYPTOCURRENCY"
+  },
+  {
+    "qid": "Q3044294",
+    "label": "Stellar",
+    "description": "Open-source, decentralized protocol for digital currency to fiat currency transfers",
+    "aliases": [],
+    "ner_label": "CRYPTOCURRENCY"
+  },
+  {
+    "qid": "Q7361782",
+    "label": "Ethereum",
+    "description": "Open-source blockchain featuring smart contract functionality",
+    "aliases": ["ETH"],
+    "ner_label": "CRYPTOCURRENCY"
+  },
+  {
+    "qid": "Q7361783",
+    "label": "Ethereum Classic",
+    "description": "Original Ethereum blockchain following the 2016 hard fork",
+    "aliases": [],
+    "ner_label": "CRYPTOCURRENCY"
+  },
+  {
+    "qid": "Q3202301",
+    "label": "Bitcoin",
+    "description": "Decentralized digital currency and payment system",
+    "aliases": ["BTC", "bitcoin"],
+    "ner_label": "CRYPTOCURRENCY"
+  },
+  {
+    "qid": "Q14745506",
+    "label": "Polygon",
+    "description": "Ethereum scaling platform enabling faster and cheaper transactions",
+    "aliases": ["MATIC"],
+    "ner_label": "CRYPTOCURRENCY"
+  },
+  {
+    "qid": "Q37156",
+    "label": "IBM",
+    "description": "American multinational technology company",
+    "aliases": [],
+    "ner_label": "COMPANY"
+  },
+  {
+    "qid": "Q3938490",
+    "label": "Charlie Shrem",
+    "description": "American entrepreneur and early Bitcoin adopter",
+    "aliases": [],
+    "ner_label": "PERSON"
+  },
+  {
+    "qid": "Q5398705",
+    "label": "Blockchain",
+    "description": "Decentralized distributed digital ledger technology",
+    "aliases": [],
+    "ner_label": "TECHNOLOGY"
+  },
+  {
+    "qid": "Q57665",
+    "label": "Jens Stoltenberg",
+    "description": "34th Prime Minister of Norway, 13th Secretary-General of NATO",
+    "aliases": [],
+    "ner_label": "PERSON"
+  },
+  {
+    "qid": "Q134566",
+    "label": "analyst",
+    "description": "Person who analyses a given subject",
+    "aliases": ["VC analyst", "Software analyst", "software analysts"],
+    "ner_label": "ROLE"
+  },
+  {
+    "qid": "Q134567",
+    "label": "cryptocurrency platforms",
+    "description": "Digital platforms facilitating cryptocurrency exchange and transactions",
+    "aliases": ["cryptocurrency", "cryptocurrency wallet"],
+    "ner_label": "TECHNOLOGY"
+  }
+]

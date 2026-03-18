@@ -1,165 +1,172 @@
 """
 graph_builder.py
 ----------------
-Handles all Neo4j interactions:
-  - Connecting to a Neo4j instance via py2neo
-  - Creating/merging entity nodes with metadata
-  - Creating/merging typed relationship edges
-  - Storing Word2Vec embeddings per node
-  - Bulk-loading extracted triples
+Loads extracted SPO triples into a Neo4j knowledge graph.
 
-Node schema:
-    (:Node {name, description, node_labels, url, word_vec})
+Each node is enriched with:
+  - name        : entity surface form
+  - description : fetched from Google Knowledge Graph API
+  - node_labels : entity type labels from the API
+  - url         : Wikipedia / Knowledge Graph URL
+  - word_vec    : 300-dimensional Word2Vec embedding (stored as a list)
 
-Edge types (examples):
-    invested_in, partnered_with, developed_by, hiring, based_on, ...
+Each edge represents a relation (predicate) between two entity nodes.
+
+Usage:
+    from src.graph_builder import GraphBuilder
+
+    builder = GraphBuilder(uri="bolt://localhost:7687", user="neo4j", password="secret")
+    builder.add_nodes(node_tuples)
+    builder.add_edges(edge_tuples)
 """
 
-import os
 import json
-import pathlib
-from typing import Optional
-
 import numpy as np
+import requests
+import spacy
+from pathlib import Path
+from tqdm import tqdm
 
 try:
-    from py2neo import Graph, Node, Relationship
+    from py2neo import Graph, Node, Relationship, NodeMatcher
+    from py2neo.bulk import merge_nodes
+    _PY2NEO_AVAILABLE = True
 except ImportError:
-    raise ImportError("py2neo is required: pip install py2neo")
-
-CREDS_FILE = pathlib.Path(__file__).parent.parent / "neo4j_credentials.json"
+    _PY2NEO_AVAILABLE = False
 
 
-def connect(uri: str = None, user: str = None, password: str = None) -> Graph:
+def query_google_kg(entity_name: str, api_key: str, limit: int = 1):
     """
-    Connect to Neo4j. Falls back to neo4j_credentials.json if args not supplied.
+    Query the Google Knowledge Graph Search API for an entity.
 
     Returns:
-        py2neo Graph object.
+        (descriptions, node_label_lists, urls) — each a list of length `limit`.
     """
-    if not (uri and user and password):
-        if CREDS_FILE.exists():
-            with open(CREDS_FILE) as f:
-                creds = json.load(f)
-            uri = creds["uri"]
-            user = creds["user"]
-            password = creds["password"]
-        else:
-            uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-            user = os.getenv("NEO4J_USER", "neo4j")
-            password = os.getenv("NEO4J_PASSWORD", "")
+    url = "https://kgsearch.googleapis.com/v1/entities:search"
+    params = {"query": entity_name, "key": api_key, "limit": limit, "indent": True}
+    response = requests.get(url, params=params)
+    data = response.json()
 
-    graph = Graph(uri, auth=(user, password))
-    print(f"[graph_builder] Connected to Neo4j at {uri}")
-    return graph
+    descriptions, node_labels, urls = [], [], []
+    for item in data.get("itemListElement", []):
+        result = item.get("result", {})
+        desc = result.get("detailedDescription", {}).get("articleBody", "")
+        labels = result.get("@type", [])
+        url = result.get("detailedDescription", {}).get("url", "")
+        descriptions.append(desc)
+        node_labels.append(labels)
+        urls.append(url)
+
+    return descriptions, node_labels, urls
 
 
-def create_or_merge_node(
-    graph: "Graph",
-    name: str,
-    description: str = "",
-    node_labels: list = None,
-    url: str = "",
-    word_vec: Optional[np.ndarray] = None,
-) -> "Node":
-    """
-    MERGE a node by name; update its properties if it already exists.
+def create_word_vector(text: str, nlp) -> list[float]:
+    """Generate a 300-dimensional Word2Vec embedding for a piece of text."""
+    doc = nlp(text)
+    if doc.has_vector:
+        return [float(v) for v in doc.vector]
+    # Random fallback for out-of-vocabulary text
+    return [float(v) for v in np.random.uniform(low=-1.0, high=1.0, size=(300,))]
 
-    Args:
-        graph:       py2neo Graph.
-        name:        Canonical entity name (used as unique key).
-        description: Human-readable description (from Google KG API).
-        node_labels: List of entity type strings (e.g. ["Organisation"]).
-        url:         Wikipedia / Wikidata URL.
-        word_vec:    300-dimensional Word2Vec embedding as numpy array.
 
-    Returns:
-        py2neo Node.
-    """
-    node = graph.nodes.match("Node", name=name).first()
-    props = {
-        "name": name,
-        "description": description,
-        "node_labels": json.dumps(node_labels or []),
-        "url": url,
-        "word_vec": word_vec.tolist() if word_vec is not None else [],
-    }
-    if node is None:
-        node = Node("Node", **props)
-        graph.create(node)
+class GraphBuilder:
+    """Wraps py2neo operations for bulk-loading a knowledge graph into Neo4j."""
+
+    def __init__(self, uri: str, user: str, password: str):
+        if not _PY2NEO_AVAILABLE:
+            raise ImportError("py2neo is required: pip install py2neo")
+        self.graph = Graph(uri, auth=(user, password))
+        self.nodes_matcher = NodeMatcher(self.graph)
+
+    # ------------------------------------------------------------------
+    # Node operations
+    # ------------------------------------------------------------------
+
+    def add_nodes(self, node_tuples: list[tuple]) -> None:
+        """
+        Bulk-upsert nodes into Neo4j.
+
+        Args:
+            node_tuples: List of tuples with fields:
+                (name, description, node_labels, url, word_vec)
+                where word_vec is a list of 300 floats.
+        """
+        keys = ["name", "description", "node_labels", "url", "word_vec"]
+        merge_nodes(self.graph.auto(), node_tuples, ("Node", "name"), keys=keys)
+        count = self.graph.nodes.match("Node").count()
+        print(f"Nodes in graph: {count}")
+
+    # ------------------------------------------------------------------
+    # Edge operations
+    # ------------------------------------------------------------------
+
+    def add_edges(self, edge_tuples: list[tuple]) -> None:
+        """
+        Create relationships between existing nodes.
+
+        Args:
+            edge_tuples: List of tuples with fields:
+                (subject_name, predicate_label, object_name, ...)
+        """
+        # Group edges by predicate label
+        edge_groups: dict[str, list] = {}
+        for tup in edge_tuples:
+            label = tup[1]
+            edge_groups.setdefault(label, []).append(tup)
+
+        for edge_label, tuples in tqdm(edge_groups.items(), desc="Adding edges"):
+            tx = self.graph.begin()
+            for tup in tuples:
+                src_node = self.nodes_matcher.match(name=tup[0]).first()
+                tgt_node = self.nodes_matcher.match(name=tup[2]).first()
+
+                if not src_node:
+                    src_node = Node("Node", name=tup[0])
+                    tx.create(src_node)
+                if not tgt_node:
+                    tgt_node = Node("Node", name=tup[2])
+                    tx.create(tgt_node)
+
+                try:
+                    rel = Relationship(src_node, edge_label, tgt_node)
+                    tx.create(rel)
+                except Exception as exc:
+                    print(f"  Warning: could not create edge ({tup[0]}) -[{edge_label}]-> ({tup[2]}): {exc}")
+
+            tx.commit()
+
+    # ------------------------------------------------------------------
+    # Utility
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def deduplicate_nodes(node_tuples: list[tuple]) -> list[tuple]:
+        """Remove duplicate nodes by name (keeps first occurrence)."""
+        seen: set[str] = set()
+        unique = []
+        for tup in node_tuples:
+            if tup[0] not in seen:
+                seen.add(tup[0])
+                unique.append(tup)
+        return unique
+
+    @staticmethod
+    def filter_self_referential(triples: list[tuple]) -> list[tuple]:
+        """Remove triples where subject == object."""
+        return [t for t in triples if t[0] != t[2]]
+
+
+if __name__ == "__main__":
+    # Quick connectivity check
+    import os
+
+    cred_path = Path(__file__).resolve().parent.parent / "neo4j_credentials.json"
+    if not cred_path.exists():
+        print("No neo4j_credentials.json found — skipping connectivity check.")
     else:
-        node.update(props)
-        graph.push(node)
-    return node
-
-
-def create_or_merge_relationship(
-    graph: "Graph",
-    subject_node: "Node",
-    rel_type: str,
-    object_node: "Node",
-):
-    """
-    MERGE a typed relationship between two nodes.
-
-    Args:
-        graph:        py2neo Graph.
-        subject_node: Source Node.
-        rel_type:     Relationship type string (e.g. "invested_in").
-        object_node:  Target Node.
-    """
-    # Normalise to valid Neo4j relationship type (uppercase, spaces→underscores)
-    rel_type_clean = rel_type.upper().replace(" ", "_").replace("-", "_")
-    rel = Relationship(subject_node, rel_type_clean, object_node)
-    graph.merge(rel, rel_type_clean)
-
-
-def load_triples(graph: "Graph", triples: list, node_metadata: dict = None):
-    """
-    Bulk-load a list of SPO triples into Neo4j.
-
-    Args:
-        graph:         Connected py2neo Graph.
-        triples:       List of dicts from triple_extractor.extract_triples_from_sentence.
-        node_metadata: Optional dict mapping entity name → {description, node_labels, url, word_vec}.
-    """
-    node_metadata = node_metadata or {}
-    node_cache = {}
-
-    for triple in triples:
-        subj_name = triple["subject"]
-        obj_name = triple["object"]
-        pred = triple["predicate"]
-
-        for name in (subj_name, obj_name):
-            if name not in node_cache:
-                meta = node_metadata.get(name, {})
-                node_cache[name] = create_or_merge_node(
-                    graph,
-                    name=name,
-                    description=meta.get("description", ""),
-                    node_labels=meta.get("node_labels", []),
-                    url=meta.get("url", ""),
-                    word_vec=meta.get("word_vec"),
-                )
-
-        create_or_merge_relationship(
-            graph,
-            subject_node=node_cache[subj_name],
-            rel_type=pred,
-            object_node=node_cache[obj_name],
+        with open(cred_path) as f:
+            creds = json.load(f)
+        builder = GraphBuilder(
+            uri=creds["uri"], user=creds["user"], password=creds["password"]
         )
-
-    print(f"[graph_builder] Loaded {len(triples)} triples → {len(node_cache)} nodes.")
-
-
-def fetch_graph_stats(graph: "Graph") -> dict:
-    """Return basic statistics about the current graph."""
-    node_count = graph.run("MATCH (n) RETURN count(n) AS c").evaluate()
-    edge_count = graph.run("MATCH ()-[r]->() RETURN count(r) AS c").evaluate()
-    rel_types = graph.run("CALL db.relationshipTypes()").data()
-    return {
-        "nodes": node_count,
-        "edges": edge_count,
-        "relationship_types": [r["relationshipType"] for r in rel_types],
-    }
+        print("Connected to Neo4j:", builder.graph)
