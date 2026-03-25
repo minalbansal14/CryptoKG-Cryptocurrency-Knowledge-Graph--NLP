@@ -1,0 +1,72 @@
+[
+  {
+    "pid": "P1327",
+    "label": "partners",
+    "description": "Professional collaboration between companies",
+    "aliases": [
+      "partner in business or sport",
+      "joined forces",
+      "partners with",
+      "partnered with",
+      "collaborates with",
+      "partnership",
+      "partnered"
+    ]
+  },
+  {
+    "pid": "P899277",
+    "label": "recruitment",
+    "description": "Process of attracting, selecting and appointing candidates to a job or other organization",
+    "aliases": [
+      "hiring",
+      "seeking",
+      "vacancy",
+      "recruitment"
+    ]
+  },
+  {
+    "pid": "P1951",
+    "label": "investor",
+    "description": "Individual or organization which invests money in the item for the purpose of obtaining financial return",
+    "aliases": [
+      "invests",
+      "investing",
+      "invested",
+      "investment",
+      "invested in",
+      "investor"
+    ]
+  },
+  {
+    "pid": "P61",
+    "label": "discoverer or inventor",
+    "description": "Subject who discovered, first described, invented, or developed this discovery or invention",
+    "aliases": [
+      "coined",
+      "inventor",
+      "developer",
+      "created by",
+      "developed by",
+      "discoverer",
+      "invented",
+      "devised by",
+      "discovered by",
+      "first described",
+      "introduced by",
+      "invented by",
+      "inventor or discoverer",
+      "discovered"
+    ]
+  },
+  {
+    "pid": "P144",
+    "label": "based on",
+    "description": "The work(s) used as the basis for subject item",
+    "aliases": [
+      "adaptation of",
+      "cover of",
+      "derivative of",
+      "based on"
+    ]
+  }
+]
